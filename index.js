@@ -1,33 +1,12 @@
 import galleryItems from "./gallery-items.js";
-console.log(galleryItems);
 const list = document.querySelector(".js-gallery");
 const div = document.querySelector(".js-lightbox");
-//console.log(div);
 const modalImg = document.querySelector(".lightbox__image");
-//console.log(modalImg);
 const btn = document.querySelector(".lightbox__button");
-//console.log(btn);
 const modal = document.querySelector(".lightbox__overlay");
-//console.log(modal);
-
-// / <li class="gallery__item">
-//   <a
-//     class="gallery__link"
-//     href="https://cdn.pixabay.com/photo/2010/12/13/10/13/tulips-2546_1280.jpg"
-//   >
-//     <img
-//       class="gallery__image"
-//       src="https://cdn.pixabay.com/photo/2010/12/13/10/13/tulips-2546__340.jpg"
-//       data-source="https://cdn.pixabay.com/photo/2010/12/13/10/13/tulips-2546_1280.jpg"
-//       alt="Tulips"
-//     />
-//   </a>
-// </li>
 
 galleryItems.map((item, i) => {
-  // console.log(item);
   const img = document.createElement("img");
-  // console.log(img);
   img.classList.add("gallery__image");
   img.src = item.preview;
   img.setAttribute("data-source", item.original);
@@ -35,14 +14,12 @@ galleryItems.map((item, i) => {
   img.setAttribute("data-index", i);
 
   const link = document.createElement("a");
-  // console.log(link);
   link.classList.add("gallery__link");
   link.href = item.original;
 
   link.append(img);
 
   const li = document.createElement("li");
-  //console.log(li);
   li.classList.add("gallery__item");
 
   li.append(link);
@@ -52,11 +29,10 @@ galleryItems.map((item, i) => {
 
 list.addEventListener("click", (e) => {
   e.preventDefault();
-  console.log(e.target);
-  console.log(e.target.dataset.source);
   let modalLink = e.target.dataset.source;
   div.classList.add("is-open");
   modalImg.src = modalLink;
+  modalImg.dataset.ind = 0;
 });
 
 btn.addEventListener("click", () => {
@@ -69,23 +45,35 @@ modal.addEventListener("click", () => {
   modalImg.src = "";
 });
 window.addEventListener("keyup", (event) => {
-  console.log(event.keyCode);
-  if (event.keyCode === 27) {
+  if (event.code === "Escape") {
     div.classList.remove("is-open");
     modalImg.src = "";
   }
 });
 window.addEventListener("keyup", (event) => {
-  if (event.keyCode === 37) {
+  if (event.code === "ArrowLeft") {
+    pressLeft();
   }
 });
 window.addEventListener("keyup", (event) => {
-  event.preventDefault();
-  console.dir(event.target.childNodes[0].dataset.index);
-  let i = event.target.childNodes[0].dataset.index;
-  console.log(galleryItems[i + 1]);
-  const img = galleryItems.find((elem, idx) => (idx === i + 1 ? elem : ""));
-  console.log(img);
-  if (event.keyCode === 39) {
+  if (event.code === "ArrowRight") {
+    pressRight();
   }
 });
+function setModalImageAttribute(step, index) {
+  modalImg.src = galleryItems[index + step].original;
+  modalImg.alt = galleryItems[index + step].description;
+  modalImg.dataset.ind = `${index + step}`;
+}
+function pressRight() {
+  const index = +modalImg.dataset.ind;
+  // console.log(index);
+  if (index === galleryItems.length - 1) return;
+  setModalImageAttribute(1, index);
+}
+function pressLeft() {
+  const index = +modalImg.dataset.ind;
+  // console.log(index);
+  if (index === 0) return;
+  setModalImageAttribute(-1, index);
+}
